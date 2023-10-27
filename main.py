@@ -1,6 +1,7 @@
 import functools
 import random
 import numpy as np
+from torch import le
 
 
 def tournament_selection(population, pop_fitness, tournament_size: int = 2):
@@ -28,10 +29,6 @@ def tournament_selection(population, pop_fitness, tournament_size: int = 2):
             )
             for rank, individual in tournament
         ]
-        # winner = np.random.choice(
-        #     [indiv for _, indiv, _ in tournament_probabilities],
-        #     p=[prob for _, _, prob in tournament_probabilities],
-        # )
         winner = random.choices(
             [indiv for _, indiv, _ in tournament_probabilities],
             weights=[prob for _, _, prob in tournament_probabilities],
@@ -44,10 +41,12 @@ def tournament_selection(population, pop_fitness, tournament_size: int = 2):
 def mutate(population, mutation_magnitude: float = 0.1):
     mutated_population = []
     for individual in population:
-        mutated_individual = [
-            gene + random.uniform(-mutation_magnitude, mutation_magnitude)
-            for gene in individual
-        ]
+        mutated_individual = np.array(
+            [
+                gene + np.random.uniform(-mutation_magnitude, mutation_magnitude)
+                for gene in individual
+            ]
+        )
         mutated_population.append(mutated_individual)
     return mutated_population
 
@@ -57,9 +56,7 @@ def init_population(
 ):
     population = []
     for _ in range(population_size):
-        individual = [
-            random.uniform(bottom_limit, upper_limit) for _ in range(individual_size)
-        ]
+        individual = np.random.uniform(bottom_limit, upper_limit, size=individual_size)
         population.append(individual)
     return population
 
@@ -111,10 +108,11 @@ def main():
         all_bests.append(best_indiv)
 
     print(all_bests)
-    # avg_best = np.sum(all_bests) / len(all_bests)
-    avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests)
+    print(type(all_bests))
+    avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests) / len(
+        all_bests
+    )
 
-    print("avg", avg_best)
     print(f"Average best X: {avg_best}, best fitness: {tested_func(avg_best)}")
 
 
