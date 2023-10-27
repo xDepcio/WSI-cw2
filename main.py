@@ -46,6 +46,33 @@ def mutate(population, mutation_magnitude: float = 0.1):
     return mutated_population
 
 
+def init_population(
+    population_size: int, individual_size: int, bottom_limit: float, upper_limit: float
+):
+    population = []
+    for _ in range(population_size):
+        individual = [
+            random.uniform(bottom_limit, upper_limit) for _ in range(individual_size)
+        ]
+        population.append(individual)
+    return population
+
+
+def main(target_function, population_size: int = 100, mutation_magnitude: float = 0.1):
+    BUDGET = 10000
+    iter_limit = BUDGET / population_size
+    curr_iter = 0
+
+    population = init_population(population_size, 10, -100, 100)
+
+    while curr_iter < iter_limit:
+        population = tournament_selection(
+            population, target_function, tournament_size=2
+        )
+        population = mutate(population, mutation_magnitude=mutation_magnitude)
+        curr_iter += 1
+
+
 def test():
     xd = np.array([4, 2, 3])
     xd2 = sorted(xd, key=lambda x: x, reverse=True)
