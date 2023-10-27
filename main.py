@@ -62,13 +62,16 @@ def init_population(
 
 
 def evolve_best(
-    target_function, population_size: int = 100, mutation_magnitude: float = 0.1
+    target_function,
+    population_size: int = 100,
+    mutation_magnitude: float = 0.1,
+    dimenstionality: int = 2,
 ):
     BUDGET = 10000
     iter_limit = BUDGET / population_size
     curr_iter = 0
 
-    curr_population = init_population(population_size, 2, -100, 100)
+    curr_population = init_population(population_size, dimenstionality, -100, 100)
     curr_pop_fitness = [target_function(individual) for individual in curr_population]
     best_indiv, best_fitness = min(
         zip(curr_population, curr_pop_fitness), key=lambda x: x[1]
@@ -102,13 +105,14 @@ def main():
     tested_func = booth_function
     all_bests = []
     for _ in range(25):
-        best_indiv, best_fitness = evolve_best(
-            target_function=tested_func, population_size=100, mutation_magnitude=1
+        best_indiv, _ = evolve_best(
+            target_function=tested_func,
+            population_size=100,
+            mutation_magnitude=1,
+            dimenstionality=2,
         )
         all_bests.append(best_indiv)
 
-    print(all_bests)
-    print(type(all_bests))
     avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests) / len(
         all_bests
     )
