@@ -30,10 +30,6 @@ def tournament_selection(population, function, tournament_size: int = 2):
             [indiv for _, indiv, _ in tournament_probabilities],
             p=[prob for _, _, prob in tournament_probabilities],
         )
-        # random.choices(
-        #     population=[indiv for _, indiv, _ in tournament_probabilities],
-        #     weights=[prob for _, _, prob in tournament_probabilities],
-        # )[0]
         selected_individuals.append(winner)
 
     return selected_individuals
