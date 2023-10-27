@@ -35,6 +35,17 @@ def tournament_selection(population, function, tournament_size: int = 2):
     return selected_individuals
 
 
+def mutate(population, mutation_magnitude: float = 0.1):
+    mutated_population = []
+    for individual in population:
+        mutated_individual = [
+            gene + random.uniform(-mutation_magnitude, mutation_magnitude)
+            for gene in individual
+        ]
+        mutated_population.append(mutated_individual)
+    return mutated_population
+
+
 def test():
     xd = np.array([4, 2, 3])
     xd2 = sorted(xd, key=lambda x: x, reverse=True)
