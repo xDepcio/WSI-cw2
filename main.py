@@ -1,3 +1,4 @@
+import functools
 import random
 import numpy as np
 
@@ -63,8 +64,10 @@ def init_population(
     return population
 
 
-def main(target_function, population_size: int = 100, mutation_magnitude: float = 0.1):
-    BUDGET = 100000
+def evolve_best(
+    target_function, population_size: int = 100, mutation_magnitude: float = 0.1
+):
+    BUDGET = 10000
     iter_limit = BUDGET / population_size
     curr_iter = 0
 
@@ -90,7 +93,7 @@ def main(target_function, population_size: int = 100, mutation_magnitude: float 
         curr_iter += 1
         curr_population = new_population
 
-    print(f"Best individual: {best_indiv}, fitness: {best_fitness}")
+    return best_indiv, best_fitness
 
 
 def booth_function(individual):
@@ -98,4 +101,22 @@ def booth_function(individual):
     return (x + 2 * y - 7) ** 2 + (2 * x + y - 5) ** 2
 
 
-main(target_function=booth_function, population_size=100, mutation_magnitude=0.1)
+def main():
+    tested_func = booth_function
+    all_bests = []
+    for _ in range(25):
+        best_indiv, best_fitness = evolve_best(
+            target_function=tested_func, population_size=100, mutation_magnitude=1
+        )
+        all_bests.append(best_indiv)
+
+    print(all_bests)
+    # avg_best = np.sum(all_bests) / len(all_bests)
+    avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests)
+
+    print("avg", avg_best)
+    print(f"Average best X: {avg_best}, best fitness: {tested_func(avg_best)}")
+
+
+if __name__ == "__main__":
+    main()
