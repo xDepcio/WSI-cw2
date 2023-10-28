@@ -108,7 +108,7 @@ def main():
         best_indiv, _ = evolve_best(
             target_function=tested_func,
             population_size=100,
-            mutation_magnitude=1,
+            mutation_magnitude=0.1,
             dimenstionality=2,
         )
         all_bests.append(best_indiv)
