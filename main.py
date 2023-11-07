@@ -3,6 +3,8 @@ import random
 import numpy as np
 from torch import le
 
+from cec2017.functions import f2, f13
+
 
 def tournament_selection(population, pop_fitness, tournament_size: int = 2):
     selected_individuals = []
@@ -67,7 +69,7 @@ def evolve_best(
     mutation_magnitude: float = 0.1,
     dimenstionality: int = 2,
 ):
-    BUDGET = 10000
+    BUDGET = 50000
     iter_limit = BUDGET / population_size
     curr_iter = 0
 
@@ -101,24 +103,71 @@ def booth_function(individual):
     return (x + 2 * y - 7) ** 2 + (2 * x + y - 5) ** 2
 
 
-def main():
-    tested_func = booth_function
+def main(
+    tested_func=f2, population_size=100, mutation_magnitude=0.1, dimenstionality=2
+):
+    tested_func = tested_func
     all_bests = []
-    for _ in range(25):
-        best_indiv, _ = evolve_best(
+    for _ in range(30):
+        best_indiv, best_fitness = evolve_best(
             target_function=tested_func,
-            population_size=100,
-            mutation_magnitude=0.1,
-            dimenstionality=2,
+            population_size=population_size,
+            mutation_magnitude=mutation_magnitude,
+            dimenstionality=dimenstionality,
         )
-        all_bests.append(best_indiv)
+        all_bests.append((best_indiv, best_fitness))
 
-    avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests) / len(
-        all_bests
+    # avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests) / len(
+    #     all_bests
+    # )
+    avg_best_fitness = functools.reduce(
+        lambda acc, curr: acc + curr, [tup[1] for tup in all_bests]
+    ) / len(all_bests)
+    all_worst_fitness = max([tup[1] for tup in all_bests])
+    all_best_fitness = min([tup[1] for tup in all_bests])
+    std_deviation = np.std([tup[1] for tup in all_bests])
+
+    print(
+        f"Population size: {population_size}, mutation magnitude: {mutation_magnitude}"
     )
-
-    print(f"Average best X: {avg_best}, best fitness: {tested_func(avg_best)}")
+    # print(f"Average best X: {avg_best}, best fitness: {tested_func(avg_best)}\n\n")
+    print(
+        f"Fitness stats: AVG: {avg_best_fitness}, BEST: {all_best_fitness} WORST: {all_worst_fitness} STD: {std_deviation}\n"
+    )
 
 
 if __name__ == "__main__":
-    main()
+    tests = [
+        (f13, 3, 0.1, 10),
+        (f13, 9, 0.1, 10),
+        (f13, 27, 0.1, 10),
+        (f13, 81, 0.1, 10),
+        (f13, 163, 0.1, 10),
+        (f13, 3, 0.5, 10),
+        (f13, 9, 0.5, 10),
+        (f13, 27, 0.5, 10),
+        (f13, 81, 0.5, 10),
+        (f13, 163, 0.5, 10),
+        (f13, 3, 1, 10),
+        (f13, 9, 1, 10),
+        (f13, 27, 1, 10),
+        (f13, 81, 1, 10),
+        (f13, 163, 1, 10),
+        (f13, 3, 3, 10),
+        (f13, 9, 3, 10),
+        (f13, 27, 3, 10),
+        (f13, 81, 3, 10),
+        (f13, 163, 3, 10),
+        (f13, 3, 5, 10),
+        (f13, 9, 5, 10),
+        (f13, 27, 5, 10),
+        (f13, 81, 5, 10),
+        (f13, 163, 5, 10),
+        (f13, 3, 10, 10),
+        (f13, 9, 10, 10),
+        (f13, 27, 10, 10),
+        (f13, 81, 10, 10),
+        (f13, 163, 10, 10),
+    ]
+    for test in tests:
+        main(*test)
