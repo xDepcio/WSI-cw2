@@ -104,7 +104,10 @@ def booth_function(individual):
 
 
 def main(
-    tested_func=f2, population_size=100, mutation_magnitude=0.1, dimenstionality=2
+    tested_func=f2,
+    population_size=100,
+    mutation_magnitude=0.1,
+    dimenstionality=2,
 ):
     tested_func = tested_func
     all_bests = []
@@ -117,9 +120,6 @@ def main(
         )
         all_bests.append((best_indiv, best_fitness))
 
-    # avg_best = functools.reduce(lambda acc, curr: acc + curr, all_bests) / len(
-    #     all_bests
-    # )
     avg_best_fitness = functools.reduce(
         lambda acc, curr: acc + curr, [tup[1] for tup in all_bests]
     ) / len(all_bests)
@@ -128,9 +128,9 @@ def main(
     std_deviation = np.std([tup[1] for tup in all_bests])
 
     print(
-        f"Population size: {population_size}, mutation magnitude: {mutation_magnitude}"
+        f"func: {tested_func.__name__}, Population size: {population_size}, mutation magnitude: {mutation_magnitude}"
     )
-    # print(f"Average best X: {avg_best}, best fitness: {tested_func(avg_best)}\n\n")
+
     print(
         f"Fitness stats: AVG: {avg_best_fitness}, BEST: {all_best_fitness} WORST: {all_worst_fitness} STD: {std_deviation}\n"
     )
@@ -138,36 +138,68 @@ def main(
 
 if __name__ == "__main__":
     tests = [
-        (f13, 3, 0.1, 10),
-        (f13, 9, 0.1, 10),
-        (f13, 27, 0.1, 10),
-        (f13, 81, 0.1, 10),
-        (f13, 163, 0.1, 10),
-        (f13, 3, 0.5, 10),
-        (f13, 9, 0.5, 10),
-        (f13, 27, 0.5, 10),
-        (f13, 81, 0.5, 10),
-        (f13, 163, 0.5, 10),
+        # f2 tests
+        (f2, 3, 1, 10),
+        (f2, 9, 1, 10),
+        (f2, 27, 1, 10),
+        (f2, 81, 1, 10),
+        (f2, 163, 1, 10),
+        (f2, 250, 1, 10),
+        (f2, 3, 3, 10),
+        (f2, 9, 3, 10),
+        (f2, 27, 3, 10),
+        (f2, 81, 3, 10),
+        (f2, 163, 3, 10),
+        (f2, 250, 3, 10),
+        (f2, 3, 5, 10),
+        (f2, 9, 5, 10),
+        (f2, 27, 5, 10),
+        (f2, 81, 5, 10),
+        (f2, 163, 5, 10),
+        (f2, 250, 5, 10),
+        (f2, 3, 10, 10),
+        (f2, 9, 10, 10),
+        (f2, 27, 10, 10),
+        (f2, 81, 10, 10),
+        (f2, 163, 10, 10),
+        (f2, 250, 10, 10),
+        (f2, 3, 15, 10),
+        (f2, 9, 15, 10),
+        (f2, 27, 15, 10),
+        (f2, 81, 15, 10),
+        (f2, 163, 15, 10),
+        (f2, 250, 15, 10),
+        # f13 tests
         (f13, 3, 1, 10),
         (f13, 9, 1, 10),
         (f13, 27, 1, 10),
         (f13, 81, 1, 10),
         (f13, 163, 1, 10),
+        (f13, 250, 1, 10),
         (f13, 3, 3, 10),
         (f13, 9, 3, 10),
         (f13, 27, 3, 10),
         (f13, 81, 3, 10),
         (f13, 163, 3, 10),
+        (f13, 250, 3, 10),
         (f13, 3, 5, 10),
         (f13, 9, 5, 10),
         (f13, 27, 5, 10),
         (f13, 81, 5, 10),
         (f13, 163, 5, 10),
+        (f13, 250, 5, 10),
         (f13, 3, 10, 10),
         (f13, 9, 10, 10),
         (f13, 27, 10, 10),
         (f13, 81, 10, 10),
         (f13, 163, 10, 10),
+        (f13, 250, 10, 10),
+        (f13, 3, 15, 10),
+        (f13, 9, 15, 10),
+        (f13, 27, 15, 10),
+        (f13, 81, 15, 10),
+        (f13, 163, 15, 10),
+        (f13, 250, 15, 10),
     ]
     for test in tests:
         main(*test)
