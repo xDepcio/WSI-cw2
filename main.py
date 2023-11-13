@@ -69,11 +69,12 @@ def evolve_best(
     mutation_magnitude: float = 0.1,
     dimenstionality: int = 2,
 ):
-    BUDGET = 50000
+    BUDGET = 10000
+    CLIP_L = 100
     iter_limit = BUDGET / population_size
     curr_iter = 0
 
-    curr_population = init_population(population_size, dimenstionality, -100, 100)
+    curr_population = init_population(population_size, dimenstionality, -CLIP_L, CLIP_L)
     curr_pop_fitness = [target_function(individual) for individual in curr_population]
     best_indiv, best_fitness = min(
         zip(curr_population, curr_pop_fitness), key=lambda x: x[1]
@@ -83,7 +84,11 @@ def evolve_best(
         new_population = tournament_selection(
             curr_population, curr_pop_fitness, tournament_size=2
         )
-        new_population = mutate(new_population, mutation_magnitude=mutation_magnitude)
+        new_population = np.clip(
+            mutate(new_population, mutation_magnitude=mutation_magnitude),
+            -CLIP_L,
+            CLIP_L,
+        )
         new_pop_fitness = [target_function(individual) for individual in new_population]
         new_best_indiv, new_best_fitness = min(
             zip(new_population, new_pop_fitness), key=lambda x: x[1]
@@ -127,79 +132,111 @@ def main(
     all_best_fitness = min([tup[1] for tup in all_bests])
     std_deviation = np.std([tup[1] for tup in all_bests])
 
+    avg_point = functools.reduce(
+        lambda acc, curr: acc + curr, [tup[0] for tup in all_bests]
+    ) / len(all_bests)
+    avg_point_fitness = tested_func(avg_point)
+
     print(
         f"func: {tested_func.__name__}, Population size: {population_size}, mutation magnitude: {mutation_magnitude}"
     )
 
     print(
-        f"Fitness stats: AVG: {avg_best_fitness}, BEST: {all_best_fitness} WORST: {all_worst_fitness} STD: {std_deviation}\n"
+        f"Fitness stats: AVG: {avg_best_fitness}, BEST: {all_best_fitness} WORST: {all_worst_fitness}, STD: {std_deviation}, AVG_X: {avg_point}, AVG_X_F: {avg_point_fitness}\n"
     )
 
 
 if __name__ == "__main__":
     tests = [
         # f2 tests
-        (f2, 3, 1, 10),
-        (f2, 9, 1, 10),
-        (f2, 27, 1, 10),
-        (f2, 81, 1, 10),
-        (f2, 163, 1, 10),
-        (f2, 250, 1, 10),
-        (f2, 3, 3, 10),
-        (f2, 9, 3, 10),
-        (f2, 27, 3, 10),
-        (f2, 81, 3, 10),
-        (f2, 163, 3, 10),
-        (f2, 250, 3, 10),
-        (f2, 3, 5, 10),
-        (f2, 9, 5, 10),
-        (f2, 27, 5, 10),
-        (f2, 81, 5, 10),
-        (f2, 163, 5, 10),
-        (f2, 250, 5, 10),
-        (f2, 3, 10, 10),
-        (f2, 9, 10, 10),
-        (f2, 27, 10, 10),
-        (f2, 81, 10, 10),
-        (f2, 163, 10, 10),
-        (f2, 250, 10, 10),
-        (f2, 3, 15, 10),
-        (f2, 9, 15, 10),
-        (f2, 27, 15, 10),
-        (f2, 81, 15, 10),
-        (f2, 163, 15, 10),
-        (f2, 250, 15, 10),
+        (f2, 2, 0.1, 10),
+        (f2, 4, 0.1, 10),
+        (f2, 8, 0.1, 10),
+        (f2, 16, 0.1, 10),
+        (f2, 32, 0.1, 10),
+        (f2, 64, 0.1, 10),
+        (f2, 128, 0.1, 10),
+        (f2, 2, 0.5, 10),
+        (f2, 4, 0.5, 10),
+        (f2, 8, 0.5, 10),
+        (f2, 16, 0.5, 10),
+        (f2, 32, 0.5, 10),
+        (f2, 64, 0.5, 10),
+        (f2, 128, 0.5, 10),
+        (f2, 2, 1, 10),
+        (f2, 4, 1, 10),
+        (f2, 8, 1, 10),
+        (f2, 16, 1, 10),
+        (f2, 32, 1, 10),
+        (f2, 64, 1, 10),
+        (f2, 128, 1, 10),
+        (f2, 2, 3, 10),
+        (f2, 4, 3, 10),
+        (f2, 8, 3, 10),
+        (f2, 16, 3, 10),
+        (f2, 32, 3, 10),
+        (f2, 64, 3, 10),
+        (f2, 128, 3, 10),
+        (f2, 2, 5, 10),
+        (f2, 4, 5, 10),
+        (f2, 8, 5, 10),
+        (f2, 16, 5, 10),
+        (f2, 32, 5, 10),
+        (f2, 64, 5, 10),
+        (f2, 128, 5, 10),
+        (f2, 2, 10, 10),
+        (f2, 4, 10, 10),
+        (f2, 8, 10, 10),
+        (f2, 16, 10, 10),
+        (f2, 32, 10, 10),
+        (f2, 64, 10, 10),
+        (f2, 128, 10, 10),
         # f13 tests
-        (f13, 3, 1, 10),
-        (f13, 9, 1, 10),
-        (f13, 27, 1, 10),
-        (f13, 81, 1, 10),
-        (f13, 163, 1, 10),
-        (f13, 250, 1, 10),
-        (f13, 3, 3, 10),
-        (f13, 9, 3, 10),
-        (f13, 27, 3, 10),
-        (f13, 81, 3, 10),
-        (f13, 163, 3, 10),
-        (f13, 250, 3, 10),
-        (f13, 3, 5, 10),
-        (f13, 9, 5, 10),
-        (f13, 27, 5, 10),
-        (f13, 81, 5, 10),
-        (f13, 163, 5, 10),
-        (f13, 250, 5, 10),
-        (f13, 3, 10, 10),
-        (f13, 9, 10, 10),
-        (f13, 27, 10, 10),
-        (f13, 81, 10, 10),
-        (f13, 163, 10, 10),
-        (f13, 250, 10, 10),
-        (f13, 3, 15, 10),
-        (f13, 9, 15, 10),
-        (f13, 27, 15, 10),
-        (f13, 81, 15, 10),
-        (f13, 163, 15, 10),
-        (f13, 250, 15, 10),
+        (f13, 2, 0.1, 10),
+        (f13, 4, 0.1, 10),
+        (f13, 8, 0.1, 10),
+        (f13, 16, 0.1, 10),
+        (f13, 32, 0.1, 10),
+        (f13, 64, 0.1, 10),
+        (f13, 128, 0.1, 10),
+        (f13, 2, 0.5, 10),
+        (f13, 4, 0.5, 10),
+        (f13, 8, 0.5, 10),
+        (f13, 16, 0.5, 10),
+        (f13, 32, 0.5, 10),
+        (f13, 64, 0.5, 10),
+        (f13, 128, 0.5, 10),
+        (f13, 2, 1, 10),
+        (f13, 4, 1, 10),
+        (f13, 8, 1, 10),
+        (f13, 16, 1, 10),
+        (f13, 32, 1, 10),
+        (f13, 64, 1, 10),
+        (f13, 128, 1, 10),
+        (f13, 2, 3, 10),
+        (f13, 4, 3, 10),
+        (f13, 8, 3, 10),
+        (f13, 16, 3, 10),
+        (f13, 32, 3, 10),
+        (f13, 64, 3, 10),
+        (f13, 128, 3, 10),
+        (f13, 2, 5, 10),
+        (f13, 4, 5, 10),
+        (f13, 8, 5, 10),
+        (f13, 16, 5, 10),
+        (f13, 32, 5, 10),
+        (f13, 64, 5, 10),
+        (f13, 128, 5, 10),
+        (f13, 2, 10, 10),
+        (f13, 4, 10, 10),
+        (f13, 8, 10, 10),
+        (f13, 16, 10, 10),
+        (f13, 32, 10, 10),
+        (f13, 64, 10, 10),
+        (f13, 128, 10, 10),
+        # other
+        # (booth_function, 150, 1, 2),
+        # (f2, 16, 0.5, 2),
     ]
     for test in tests:
         main(*test)
