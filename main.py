@@ -69,7 +69,7 @@ def evolve_best(
     mutation_magnitude: float = 0.1,
     dimenstionality: int = 2,
 ):
-    BUDGET = 10000
+    BUDGET = 50000
     CLIP_L = 100
     iter_limit = BUDGET / population_size
     curr_iter = 0
