@@ -6,38 +6,28 @@ from torch import le
 from cec2017.functions import f2, f13
 
 
-def tournament_selection(population, pop_fitness, tournament_size: int = 2):
-    selected_individuals = []
-    sorted_population_w_fit = sorted(
-        zip(population, pop_fitness), key=lambda entry: entry[1], reverse=False
-    )
-    pop_with_ranks = [
-        (rank + 1, individual)
-        for rank, (individual, _) in enumerate(sorted_population_w_fit)
+def tournament_repr(population, pop_fitness, tournament_size: int = 2):
+    new_population = []
+    pop_w_fit = zip(population, pop_fitness)
+    sorted_pop_w_fit = sorted(pop_w_fit, key=lambda entry: entry[1], reverse=False)
+    sorted_pop_w_fit_w_ranks = [
+        (rank + 1, indiv, fit) for rank, (indiv, fit) in enumerate(sorted_pop_w_fit)
     ]
+    for _ in range(len(sorted_pop_w_fit_w_ranks)):
+        (_, i_indiv, i_fit), (_, j_indiv, j_fit) = random.choices(
+            sorted_pop_w_fit_w_ranks,
+            k=2,
+            weights=[
+                1 - rank / len(sorted_pop_w_fit_w_ranks)
+                for rank, _, _ in sorted_pop_w_fit_w_ranks
+            ],
+        )
+        if i_fit <= j_fit:
+            new_population.append(i_indiv)
+        else:
+            new_population.append(j_indiv)
 
-    for _ in range(len(population)):
-        tournament = random.sample(pop_with_ranks, tournament_size)
-        tournament_probabilities = [
-            (
-                rank,
-                individual,
-                1
-                / len(population)
-                * (
-                    (len(population) - rank + 1) ** tournament_size
-                    - (len(population) - rank) ** tournament_size
-                ),
-            )
-            for rank, individual in tournament
-        ]
-        winner = random.choices(
-            [indiv for _, indiv, _ in tournament_probabilities],
-            weights=[prob for _, _, prob in tournament_probabilities],
-        )[0]
-        selected_individuals.append(winner)
-
-    return selected_individuals
+    return new_population
 
 
 def mutate(population, mutation_magnitude: float = 0.1):
@@ -45,7 +35,7 @@ def mutate(population, mutation_magnitude: float = 0.1):
     for individual in population:
         mutated_individual = np.array(
             [
-                gene + np.random.uniform(-mutation_magnitude, mutation_magnitude)
+                gene + np.random.normal(loc=0.0, scale=mutation_magnitude, size=None)
                 for gene in individual
             ]
         )
@@ -81,7 +71,7 @@ def evolve_best(
     )
 
     while curr_iter < iter_limit:
-        new_population = tournament_selection(
+        new_population = tournament_repr(
             curr_population, curr_pop_fitness, tournament_size=2
         )
         new_population = np.clip(
@@ -99,6 +89,7 @@ def evolve_best(
 
         curr_iter += 1
         curr_population = new_population
+        curr_pop_fitness = new_pop_fitness
 
     return best_indiv, best_fitness
 
@@ -123,27 +114,13 @@ def main(
             mutation_magnitude=mutation_magnitude,
             dimenstionality=dimenstionality,
         )
-        all_bests.append((best_indiv, best_fitness))
-
-    avg_best_fitness = functools.reduce(
-        lambda acc, curr: acc + curr, [tup[1] for tup in all_bests]
-    ) / len(all_bests)
-    all_worst_fitness = max([tup[1] for tup in all_bests])
-    all_best_fitness = min([tup[1] for tup in all_bests])
-    std_deviation = np.std([tup[1] for tup in all_bests])
-
-    avg_point = functools.reduce(
-        lambda acc, curr: acc + curr, [tup[0] for tup in all_bests]
-    ) / len(all_bests)
-    avg_point_fitness = tested_func(avg_point)
+        all_bests.append(best_fitness)
 
     print(
-        f"func: {tested_func.__name__}, Population size: {population_size}, mutation magnitude: {mutation_magnitude}"
+        f"F: {tested_func.__name__}, P_SIZE: {population_size}, MUT: {mutation_magnitude}"
     )
-
-    print(
-        f"Fitness stats: AVG: {avg_best_fitness}, BEST: {all_best_fitness} WORST: {all_worst_fitness}, STD: {std_deviation}, AVG_X: {avg_point}, AVG_X_F: {avg_point_fitness}\n"
-    )
+    print("AVG | MIN | MAX | STD")
+    print(np.mean(all_bests), min(all_bests), max(all_bests), np.std(all_bests), "\n")
 
 
 if __name__ == "__main__":
@@ -236,7 +213,8 @@ if __name__ == "__main__":
         (f13, 128, 10, 10),
         # other
         # (booth_function, 150, 1, 2),
-        # (f2, 16, 0.5, 2),
+        # (booth_function, 16, 0.5, 2),
+        # (f2, 16, 0.5, 10),
     ]
     for test in tests:
         main(*test)
