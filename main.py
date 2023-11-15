@@ -1,12 +1,9 @@
-import functools
 import random
 import numpy as np
-from torch import le
-
 from cec2017.functions import f2, f13
 
 
-def tournament_repr(population, pop_fitness, tournament_size: int = 2):
+def tournament_repr(population, pop_fitness):
     new_population = []
     pop_w_fit = zip(population, pop_fitness)
     sorted_pop_w_fit = sorted(pop_w_fit, key=lambda entry: entry[1], reverse=False)
@@ -58,9 +55,9 @@ def evolve_best(
     population_size: int = 100,
     mutation_magnitude: float = 0.1,
     dimenstionality: int = 2,
+    BUDGET: int = 10000,
+    CLIP_L: int = 100,
 ):
-    BUDGET = 50000
-    CLIP_L = 100
     iter_limit = BUDGET / population_size
     curr_iter = 0
 
@@ -71,9 +68,7 @@ def evolve_best(
     )
 
     while curr_iter < iter_limit:
-        new_population = tournament_repr(
-            curr_population, curr_pop_fitness, tournament_size=2
-        )
+        new_population = tournament_repr(curr_population, curr_pop_fitness)
         new_population = np.clip(
             mutate(new_population, mutation_magnitude=mutation_magnitude),
             -CLIP_L,
@@ -92,11 +87,6 @@ def evolve_best(
         curr_pop_fitness = new_pop_fitness
 
     return best_indiv, best_fitness
-
-
-def booth_function(individual):
-    x, y = individual
-    return (x + 2 * y - 7) ** 2 + (2 * x + y - 5) ** 2
 
 
 def main(
@@ -211,10 +201,6 @@ if __name__ == "__main__":
         (f13, 32, 10, 10),
         (f13, 64, 10, 10),
         (f13, 128, 10, 10),
-        # other
-        # (booth_function, 150, 1, 2),
-        # (booth_function, 16, 0.5, 2),
-        # (f2, 16, 0.5, 10),
     ]
     for test in tests:
         main(*test)
