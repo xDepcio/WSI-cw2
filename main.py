@@ -10,14 +10,15 @@ def tournament_repr(population, pop_fitness):
     sorted_pop_w_fit_w_ranks = [
         (rank + 1, indiv, fit) for rank, (indiv, fit) in enumerate(sorted_pop_w_fit)
     ]
+    weigths = [
+        1 - rank / len(sorted_pop_w_fit_w_ranks)
+        for rank, _, _ in sorted_pop_w_fit_w_ranks
+    ]
     for _ in range(len(sorted_pop_w_fit_w_ranks)):
         (_, i_indiv, i_fit), (_, j_indiv, j_fit) = random.choices(
             sorted_pop_w_fit_w_ranks,
             k=2,
-            weights=[
-                1 - rank / len(sorted_pop_w_fit_w_ranks)
-                for rank, _, _ in sorted_pop_w_fit_w_ranks
-            ],
+            weights=weigths,
         )
         if i_fit <= j_fit:
             new_population.append(i_indiv)
